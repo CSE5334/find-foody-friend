@@ -1,0 +1,109 @@
+
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Place searches</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <style>
+      html, body, #map-canvas { height: 100%; margin: 0; padding: 0;}
+    </style>
+    
+  </head>
+  <body>
+
+    <label for='searchfor' >Search near by*: </label><br/>
+	<select name='searchfor' id='searchfor'>
+	<option>--Select--</option>
+  <option  value="store">Stores</option>
+  <option value="shopping_mall">Shopping Malls</option>
+  <option value="pharmacy">Pharmacy</option>
+  <option value="restaurant">Restuarants</option>
+</select>
+  Distance*: <input type="text" id='distance'><br>
+  <button onclick="setMap()">Locate</button>
+  
+    <div id="map-canvas"></div>
+    <script type="text/javascript"src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBZ-jrUdmKwh6l8bP01Ry5UNV10ov3mWcU">
+    </script>	
+<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=places"></script>
+    <script>
+	var map;
+var service;
+var infowindow;
+
+function setMap() {
+  //var pyrmont = new google.maps.LatLng(32.7333442, -97.1124598);
+  var image = 'http://www.google.com/intl/en_us/mapfiles/ms/micons/blue-dot.png';
+  var mapOptions = {
+    zoom: 17
+  };
+  /*map = new google.maps.Map(document.getElementById('map-canvas'),mapOptions),
+             marker = new google.maps.Marker({
+                 icon: image
+             });*/
+// Try HTML5 geolocation
+  if(navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function(position) {
+      var pyrmont = new google.maps.LatLng(position.coords.latitude,
+                                       position.coords.longitude);
+      map = new google.maps.Map(document.getElementById('map-canvas'),mapOptions),
+             marker = new google.maps.Marker({
+			     map: map,
+                 position: pyrmont,
+                 icon: image
+             });
+     /* var infowindow = new google.maps.InfoWindow({
+        map: map,
+        position: pyrmont,
+        content: 'Me'
+      });*/
+
+      map.setCenter(pyrmont);
+	  var request = {
+    location: pyrmont,
+     radius: document.getElementById('distance').value,
+    types: [document.getElementById('searchfor').value]                           //document.getElementById('distance').value,
+                                //[document.getElementById('searchfor').value]
+  };
+  infowindow = new google.maps.InfoWindow();
+  var service = new google.maps.places.PlacesService(map);
+  service.nearbySearch(request, callback);
+    }, function() {
+      handleNoGeolocation(true);
+    });
+  
+}  else {
+    // Browser doesn't support Geolocation
+    handleNoGeolocation(false);
+  }
+}
+
+function callback(results, status) {
+  if (status == google.maps.places.PlacesServiceStatus.OK) {
+    for (var i = 0; i < results.length; i++) {
+      createMarker(results[i]);
+    }
+  }
+}
+
+function createMarker(place) {
+  var placeLoc = place.geometry.location;
+  var marker = new google.maps.Marker({
+    map: map,
+    position: place.geometry.location
+  });
+
+  google.maps.event.addListener(marker, 'click', function() {
+    infowindow.setContent(place.name+"<br />"+"<a href='{{url_for('signup')}}'>User Login</a>");
+    infowindow.open(map, this);
+  });
+}
+
+//function setMap() {
+google.maps.event.addDomListener(window, 'load', setMap);
+//}
+	</script>
+  </body>
+</html>

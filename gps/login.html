@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Login Page!</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="{{ url_for('static', filename="bootstrap/css/theme/" + theme + "/bootstrap.css") }}" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="{{ url_for('static', filename="bootstrap/css/jumbotron-narrow.css") }}" rel="stylesheet">
+
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="header">
+        <ul class="nav nav-pills pull-right" >
+          <li><a href="{{url_for('signup')}}">Home</a></li>
+          <!--<li><a href="#"></a></li>-->
+          <li class="active"><a href="#">Login</a></li>
+		  <li><a href="{{url_for('order')}}">Order</a></li>
+          <!--<li><a href="#"></a></li>-->
+		  <!--<li><a href="stores.html">Login</a></li>-->
+        </ul>
+        <h3 class="text-muted">Place your order here</h3>
+      </div>
+      <div id="orderSuccess" class="alert alert-success" style="display:none">
+        <p id="orderSuccessText">Thank you. Your order is placed successfully!</p>
+      </div>
+      <div id="orderDuplicate" class="alert alert-success" style="display:none">
+        <p id="orderDuplicateText">Select another order!</p>
+      </div>
+      <div id="orderError" class="alert alert-info" style="display:none">
+        <p id="orderErrorText">There is some fault in the order. Please try again</p>
+      </div>
+
+	  <div class="jumbotron" >
+        <h1>login</h1>
+        <p class="lead">Please login if you are existing user</p>
+         <a class="btn btn-lg btn-success"  data-toggle="modal" href="#loginModal">Login </a></p>
+      </div>
+
+
+
+      <div class="footer">
+        <p>&copy; place finder</p>
+      </div>
+      
+ 	      <!-- Modal -->
+       <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModal" aria-hidden="true">
+         <div class="modal-dialog">
+           <div class="modal-content">
+             <div class="modal-header">
+               <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+               <h4 class="modal-title">Login details</h4>
+             </div>
+             <div class="modal-body">
+               <form id="loginForm" role="form">
+                 <input type="hidden" id="theme" name="theme" value="{{theme}}"/>
+                 <div class="form-group">
+                   <label for="email1">Email address</label>
+                   <input type="email" class="form-control" id="email1" name="email1" placeholder="Your email address">
+                 </div>
+				 <div class="form-group">
+                   <label for="password1">Password*</label>
+                   <input type="password" class="form-control" id="password1" name="password1" placeholder="Your Password">
+                 </div>
+             </div>
+             <div class="modal-footer">
+               <button id="login" type="button" class="btn btn-primary" value="login">Login!</button>
+             </div>
+           </div><!-- /.modal-content -->
+         </div><!-- /.modal-dialog -->
+       </div><!-- /.modal -->
+
+    </div> <!-- /container -->
+
+    <script src="{{ url_for('static', filename="jquery/jquery.js") }}"></script>
+    <script src="{{ url_for('static', filename="bootstrap/js/bootstrap.min.js") }}"></script>
+    <script type="text/javascript">
+    $(document).ready(function() {
+      $("#login").click(function() {
+        $.post( "/login", $("#loginForm").serialize(),
+                function(data) {
+                  $("#signupSuccess").show();
+                }
+              )
+              .error(function(xhr) {
+                switch(xhr.status) {
+                  case 409:
+                    $("#signupDuplicate").show();
+                    break;
+                  default:
+                    $("#signupError").show();
+                }
+              })
+              .always(function() {
+                $("#loginModal").modal('hide');
+              });
+      })
+    })
+    </script>
+  </body>
+</html>
