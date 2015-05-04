@@ -1,0 +1,12 @@
+1. Used hue to filter out the restuarant types from the given set of business Ids. (VM fusion - cloudEra hue sandbox)
+2. Uploaded the user data to MongoDB and web page updates the user location when he logs in to the web page.
+
+
+
+
+
+Challenges:
+1. Clustering of reviews based on differenet restuarant
+2. Find the weighted mean of all the types
+
+

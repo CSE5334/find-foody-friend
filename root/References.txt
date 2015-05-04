@@ -1,0 +1,5 @@
+http://flask.pocoo.org/docs/0.10/tutorial/folders/#tutorial-folders - Python Flask tutorials.
+
+http://boto.readthedocs.org/en/latest/dynamodb_tut.html - boto DynamoDB
+
+http://www.linuxx.eu/2014/05/geolocate-ip-with-python.html - python  geolocation example.
