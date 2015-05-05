@@ -10,7 +10,7 @@ import pygeoip
 import operator
 import collections
 
-#DEBUG = True
+DEBUG = True
 SECRET_KEY = 'development key'
 
 app = Flask(__name__)
@@ -94,29 +94,18 @@ def show_users():
         if (doc['_id'] == user['_id']):
             continue
         else:
-            dict1 = doc['highrating']
-            score = 0
-            for k,v in dictu.items():
-                if k in dict1:
-                    score+= abs(v - dict1[k])
-                    result[doc['name']] = score
-                    cat_list.append(k)
-                    fcat.append(k)
-            cat_ulist[doc['name']] = list(set(cat_list))
-            '''for k,v in dict1.items():
-                if k in dictu:
-                        ids = {}
-                        for row in rest_cursor:
-                            if k in row['category']:
-                                ids['_id'] = row['rating']
-                        sorted_rest = sorted(ids.items(), key =operator.itemgetter(1))
-                        #print sorted_rest
-                        if len(sorted_rest) > 1:
-                            cat_rest= sorted_rest[:2]
-                        else:
-                            cat_rest= sorted_rest    
-                rest_result[doc['name']] = cat_rest
-                print rest_result'''
+            if 'highrating' not in doc:
+                continue
+            else:
+                dict1 = doc['highrating']
+                score = 0
+                for k,v in dictu.items():
+                    if k in dict1:
+                        score+= abs(v - dict1[k])
+                        result[doc['name']] = score
+                        cat_list.append(k)
+                        fcat.append(k)
+                cat_ulist[doc['name']] = list(set(cat_list))
             #Bring the restaurants ids for the each matched category
                 
         sorted_result = sorted(result.items(), key =operator.itemgetter(1))
@@ -124,7 +113,7 @@ def show_users():
     fcat = list(set(fcat))
     fcat.remove('Restaurants')
     cat_res = {}
-    
+    r_data={}
     for cat in fcat:
         rest_cursor = restaurants.find({'city': city, 'category':cat})
         if rest_cursor.count() ==0:
@@ -132,7 +121,8 @@ def show_users():
         else:
             ids=[]
             for row in rest_cursor:
-                ids.append(row['address'])
+                r_data[row['_id']] = row
+                ids.append(row['_id'])
             cat_res[cat]=ids
       
     for k,v in cat_ulist.items():
@@ -143,7 +133,7 @@ def show_users():
         rest_result[k]=pf_cat
     
     rests =  [dict(name=k, value=v)for k,v in rest_result.items()]
-    print rests
+    #print r_data
     #entries = [dict(name=k, value=v)for k,v in dict(sorted_result).items()]
     result.clear()
     fusers= []
