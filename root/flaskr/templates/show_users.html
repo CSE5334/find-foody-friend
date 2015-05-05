@@ -2,9 +2,13 @@
 {% block body %}
   <ul class=entries>
   {% for entry in entries %}
-    <li><h2>{{ entry.name }}</h2>{{ entry.value }}
+    <li><h2>{{ entry[0] }}</h2>{{ entry[1] }}
+
   {% else %}
     <li><em>Unbelievable.  No entries here so far</em>
+  {% endfor %}
+  {% for rest in rests %}
+	<li><h3>{{ rest.name }}</h3>{{ rest.value }}
   {% endfor %}
   </ul>
 {% endblock %}
