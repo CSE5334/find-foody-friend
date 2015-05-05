@@ -1,6 +1,5 @@
 
-
-{% extends "layout.html" %}
+<html>
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
 
 <!-- Optional theme -->
@@ -10,6 +9,7 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 
 {% block body %}
+<table class="table table-striped">
   <ul class=entries>
   {% for entry in entries %}
     <li><h2>{{ entry.name }}</h2>{{ entry.value }}
@@ -18,3 +18,4 @@
   {% endfor %}
   </ul>
 {% endblock %}
+</table>

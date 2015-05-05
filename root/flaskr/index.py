@@ -9,12 +9,14 @@ import ipgetter
 import pygeoip
 import operator
 import collections
+from flask_bootstrap import Bootstrap
 
 DEBUG = True
 SECRET_KEY = 'development key'
 
 app = Flask(__name__)
 app.config.from_object(__name__)
+Bootstrap(app)
 
 def connect_db():
     client = MongoClient('localhost', 27017)
@@ -35,7 +37,7 @@ def login():
             session['logged_in'] = True
             flash('Login successful')
             IP = ipgetter.myip()
-            rawdata = pygeoip.GeoIP('C:\\Users\\HarshaVardhan\\Desktop\\DM final\\GeoLiteCity.dat')
+            rawdata = pygeoip.GeoIP('../GeoLiteCity.dat')
             data = rawdata.record_by_name(IP)
             users.update(
                 {'_id': request.form['username']},
@@ -58,7 +60,8 @@ def logout():
 @app.route('/')
 def fun():
     print "hello"
-    return 'Hello'
+    error = None
+    return render_template('temp2.html', error = error)
     
 
 @app.route('/users')
@@ -92,4 +95,4 @@ def show_users():
     return render_template('show_users.html', entries = entries)
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0',debug=True)
