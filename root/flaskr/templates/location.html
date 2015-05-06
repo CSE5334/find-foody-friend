@@ -29,7 +29,8 @@
     <script>
 
       function init_map() {
-                var var_location = new google.maps.LatLng(32.7333009,-97.1125497);
+	
+                var var_location = new google.maps.LatLng({{latitude|safe}},{{longitude|safe}});
 
         var var_mapoptions = {
           center: var_location,

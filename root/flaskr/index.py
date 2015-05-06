@@ -10,6 +10,8 @@ import pygeoip
 import operator
 import collections
 from flask_bootstrap import Bootstrap
+from flask import request
+from flask import jsonify
 
 DEBUG = True
 SECRET_KEY = 'development key'
@@ -35,6 +37,10 @@ def get_rest_list(category,restaurant_list):
     else:
         return sorted_rest
     
+#@app.route("/get_my_ip", methods=["GET"])
+def get_my_ip():
+    return request.remote_addr
+
     
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -48,7 +54,7 @@ def login():
         else:
             session['logged_in'] = True
             flash('Login successful')
-            IP = ipgetter.myip()
+            IP = get_my_ip()
             rawdata = pygeoip.GeoIP('../GeoLiteCity.dat')
             data = rawdata.record_by_name(IP)
             users.update(
@@ -59,9 +65,14 @@ def login():
                             'state': data['region_code']}
                   }
                 )
+            session['latitude']=data['latitude']
+            session['longitude']=data['longitude']
             session['city']=data['city']
             session['state']=data['region_code']
             session['userData']= record
+            print data['latitude']
+            print data['longitude']
+            print data['city']
             return redirect(url_for('show_users'))
     return render_template('login.html', error = error)
 
@@ -80,8 +91,17 @@ def fun():
 @app.route('/location')
 def location():
     print "location"
-    error = None
-    return render_template('location.html', error = error)
+    error =[]
+    IP = get_my_ip()
+    print(IP)
+    rawdata = pygeoip.GeoIP('../GeoLiteCity.dat')
+    data = rawdata.record_by_name(IP)
+    latitude=data['latitude']
+    longitude=data['longitude']
+    print(latitude)
+    print(longitude)
+    
+    return render_template('location.html', error = error,latitude=latitude,longitude=longitude)
 
 @app.route('/users')
 def show_users():
