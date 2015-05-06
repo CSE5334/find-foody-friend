@@ -75,8 +75,13 @@ def logout():
 def fun():
     print "hello"
     error = None
-    return render_template('temp2.html', error = error)
+    return render_template('location.html', error = error)
     
+@app.route('/location')
+def location():
+    print "location"
+    error = None
+    return render_template('location.html', error = error)
 
 @app.route('/users')
 def show_users():
@@ -142,7 +147,7 @@ def show_users():
     fusers= []
     #print sorted_result
     
-    return render_template('show_users.html', entries = sorted_result[:2], rests=rests)
+    return render_template('show_users2.html', entries = sorted_result[:2], rests=rests)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0',debug=True)
