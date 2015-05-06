@@ -38,13 +38,24 @@
   </div><!-- /.container-fluid -->
 </nav>
 
-
+  <p>You have match with the following users with whom you can dine with:</p>
+  
 <table class="table table-striped">
 <!-- On rows -->
 <tr class="active">  
-  {% for entry in entries %}
-    <td><h2>{{ entry[0] }}</h2></td>
-	<td><h2>{{ entry[1] }}</h2></td>
+  {% for rest in rests %}
+   {% if rest.name in entries %}
+    <td><h2>{{ rest.name }}</h2>
+    	{% for k,v in (rest.value).items() %}
+		Matched Category: {{k}}  
+		<br/>
+		{% for adr in v %}
+			Restuarant Address: {{adr}} <br/>
+		{% endfor %}
+	    
+	{% endfor %}
+    {% endif %}
+	</td>
 </tr>
  {% else %}
 <tr  class="warning">

@@ -12,6 +12,9 @@ import collections
 from flask_bootstrap import Bootstrap
 from flask import request
 from flask import jsonify
+import json,ast
+import hashlib
+
 
 DEBUG = True
 SECRET_KEY = 'development key'
@@ -47,8 +50,8 @@ def login():
     error = None
     users, restaurants = connect_db()
     record = None
-    if request.method == 'POST':
-        record = users.find_one({'_id': request.form['username']})
+    if request.method == 'POST':#Get logged in user information
+        record = users.find_one({'_id': request.form['username'],'password':request.form['username']})
         if not record:
             error = 'Invalid username or password'
         else:
@@ -118,6 +121,9 @@ def show_users():
     fcat = []
     cat_ulist={}
     cat_list=[]
+    entries = []
+    rest_count={}
+    categories = collections.Counter()
     for doc in cursor:
         if (doc['_id'] == user['_id']):
             continue
@@ -128,7 +134,9 @@ def show_users():
                 dict1 = doc['highrating']
                 score = 0
                 for k,v in dictu.items():
+                    categories[k]+=int(v)
                     if k in dict1:
+                        #Use Manhattan distance to find the user match
                         score+= abs(v - dict1[k])
                         result[doc['name']] = score
                         cat_list.append(k)
@@ -137,22 +145,35 @@ def show_users():
             #Bring the restaurants ids for the each matched category
                 
         sorted_result = sorted(result.items(), key =operator.itemgetter(1))
-        #fresult = collections.Counter(result)
+        if len(sorted_result) > 2:#Fetch only top three matched users.
+            entries = [value[0] for value in sorted_result[:3]]
+        else:
+            entries = [value[0] for value in sorted_result]
+            
+    #remove duplicates from the categories by converting list to set
     fcat = list(set(fcat))
     fcat.remove('Restaurants')
     cat_res = {}
     r_data={}
+    #for each category fetch the number of restaurants from the database.
+    #Looping through database might pose a significant performance issue but
+    #on cloud since EC2 data is where webpage is hosted doesnt take much time.
     for cat in fcat:
         rest_cursor = restaurants.find({'city': city, 'category':cat})
-        if rest_cursor.count() ==0:
+        if rest_cursor.count() ==0: #If no restaurant with the caterogy
             continue
         else:
+            rest_count[cat]=rest_cursor.count()#count no. of restaurants per category
             ids=[]
             for row in rest_cursor:
-                r_data[row['_id']] = row
-                ids.append(row['_id'])
+                if (row['open'] == "{}"):#check if open hours info available
+                    open_hours = "Open Hours: Info. not available"
+                else:
+                    open_hours = "Open Hours:" + row['open']
+                    #Append the address and the restaurant open hours timings
+                ids.append(row['address'] + '\n'+ open_hours)
             cat_res[cat]=ids
-      
+    #update the restaurant data against each matched user.  
     for k,v in cat_ulist.items():
         pf_cat = {}
         for item in v:
@@ -161,13 +182,33 @@ def show_users():
         rest_result[k]=pf_cat
     
     rests =  [dict(name=k, value=v)for k,v in rest_result.items()]
-    #print r_data
-    #entries = [dict(name=k, value=v)for k,v in dict(sorted_result).items()]
     result.clear()
     fusers= []
-    #print sorted_result
+    session['category'] = categories
+    session['rest_count'] = rest_count
+    return render_template('show_users2.html', entries = entries, rests=rests, categories = categories, rest_count=rest_count)
+
+@app.route('/graph_data')#to draw graph data
+def graph_data(chartID='chart_ID', chart_type = 'pie', chart_height=300):
+#def graph_data():
+    cat_list=[]
+    rest_list=[]
+    pageType = 'graph'
+    title = {'text':'Category percent in the Area'}
+    category = session.get('category')
+    restCount = session.get('rest_count')
+    for k,v in category.items():
+        cat_list.append([k,int(v)])
+    #series = [{'type':'pie', 'name':'Category distribution', 'data':cat_list}]
+    series = ast.literal_eval(json.dumps(cat_list))
+
+    for k,v in restCount.items():
+        rest_list.append([k,int(v)])
+    rests = ast.literal_eval(json.dumps(rest_list))
+  
     
-    return render_template('show_users2.html', entries = sorted_result[:2], rests=rests)
+    return render_template('show_gchart.html',pageType = pageType, chartID=chartID,title = title, series=series,rests=rests)
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0',debug=True)
