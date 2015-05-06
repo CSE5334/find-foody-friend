@@ -51,8 +51,8 @@ def login():
     users, restaurants = connect_db()
     record = None
     if request.method == 'POST':#Get logged in user information
-        record = users.find_one({'_id': request.form['username'],'password':request.form['username']})
-        if not record:
+        record = users.find_one({'_id': request.form['username']})
+        if not record and request.form['password']=='yelpdata':
             error = 'Invalid username or password'
         else:
             session['logged_in'] = True
@@ -186,6 +186,10 @@ def show_users():
     fusers= []
     session['category'] = categories
     session['rest_count'] = rest_count
+    print entries
+    print rests
+    print categories
+    print rest_count
     return render_template('show_users2.html', entries = entries, rests=rests, categories = categories, rest_count=rest_count)
 
 @app.route('/graph_data')#to draw graph data
@@ -205,8 +209,6 @@ def graph_data(chartID='chart_ID', chart_type = 'pie', chart_height=300):
     for k,v in restCount.items():
         rest_list.append([k,int(v)])
     rests = ast.literal_eval(json.dumps(rest_list))
-  
-    
     return render_template('show_gchart.html',pageType = pageType, chartID=chartID,title = title, series=series,rests=rests)
 
 
