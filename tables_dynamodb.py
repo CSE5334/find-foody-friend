@@ -1,5 +1,5 @@
 import boto.dynamodb
-conn = boto.dynamodb.connect_to_region('us-west-2', aws_access_key_id="AKIAJIZEDKWEAUO6ZRPQ", aws_secret_access_key="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")
+conn = boto.dynamodb.connect_to_region('us-west-2', aws_access_key_id="", aws_secret_access_key="/")
 
 '''user_table_schema = conn.create_schema(
         hash_key_name='user_id',
